@@ -38,9 +38,9 @@ app.use('/api', swaggerUi.serve, swaggerUi.setup(swaggerDocs));
  *           schema:
  *             type: object
  *             properties:
- *               bs:
+ *               bullshit:
  *                 type: string
- *               name:
+ *               author:
  *                 type: string
  *     responses:
  *       200:
@@ -50,7 +50,7 @@ app.use('/api', swaggerUi.serve, swaggerUi.setup(swaggerDocs));
  */
 app.post('/bullshit', async (req, res) => {
   try {
-    const { bs, name } = req.body;
+    const { bullshit, author } = req.body;
     const notionResponse = await axios.post(
       'https://api.notion.com/v1/pages',
       {
@@ -71,7 +71,7 @@ app.post('/bullshit', async (req, res) => {
               {
                 type: 'text',
                 text: {
-                  content: bs,
+                  content: bullshit,
                 },
               },
             ],
@@ -80,7 +80,7 @@ app.post('/bullshit', async (req, res) => {
             rich_text: [
               {
                 text: {
-                  content: name,
+                  content: author,
                 },
               },
             ],
@@ -96,7 +96,7 @@ app.post('/bullshit', async (req, res) => {
       }
     );
 
-    res.status(200).json(notionResponse.data);
+    res.status(200).json({ success: 'Thank you for sponsoring this nice bullshit.' });
   } catch (error) {
     res.status(500).json({ error: 'Failed to create Notion page.' });
   }
@@ -106,7 +106,7 @@ app.post('/bullshit', async (req, res) => {
  * @swagger
  * /bullshit:
  *   get:
- *     summary: Get all of the bullshit.
+ *     summary: Get all of the bullshit at once.
  *     responses:
  *       200:
  *         description: bullshit retrieved successfully.
@@ -128,11 +128,11 @@ app.get('/bullshit', async (req, res) => {
     );
 
     const pages = notionResponse.data.results.map((page) => {
-      const spruch = page.properties.Spruch?.title[0]?.text?.content || '';
+      const bullshit = page.properties.Spruch?.title[0]?.text?.content || '';
       const author = page.properties.Author?.rich_text[0]?.text?.content || '';
       
       return {
-        spruch,
+        bullshit,
         author,
       };
     });
